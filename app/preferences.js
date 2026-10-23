@@ -1,13 +1,19 @@
 export const BRUSH_PRESETS = Object.freeze([
-  { id: 'basic', nameKey: 'presetBasic', settings: { size: 12, opacity: 100, smoothing: 35, pressure: true } },
-  { id: 'pencil', nameKey: 'presetPencil', settings: { size: 5, opacity: 58, smoothing: 24, pressure: true } },
-  { id: 'ink', nameKey: 'presetInk', settings: { size: 3, opacity: 100, smoothing: 58, pressure: true } },
-  { id: 'marker', nameKey: 'presetMarker', settings: { size: 22, opacity: 62, smoothing: 12, pressure: false } },
+  { id: 'basic', nameKey: 'presetBasic', settings: { mode: 'pen', size: 12, opacity: 100, smoothing: 35, pressure: true } },
+  { id: 'pencil', nameKey: 'presetPencil', settings: { mode: 'pencil', size: 5, opacity: 58, smoothing: 24, pressure: true } },
+  { id: 'ink', nameKey: 'presetInk', settings: { mode: 'pen', size: 3, opacity: 100, smoothing: 58, pressure: true } },
+  { id: 'marker', nameKey: 'presetMarker', settings: { mode: 'marker', size: 22, opacity: 62, smoothing: 12, pressure: false } },
+  { id: 'airbrush', nameKey: 'presetAirbrush', settings: { mode: 'airbrush', size: 48, opacity: 72, smoothing: 8, pressure: true } },
 ]);
 
 export const MAX_CUSTOM_BRUSH_PRESETS = 20;
 export const FAVORITES_KEY = 'my-paint-tool-favorites-v1';
 export const BRUSH_PRESETS_KEY = 'my-paint-brush-presets-v1';
+export const BRUSH_MODES = Object.freeze(['pen', 'pencil', 'marker', 'airbrush']);
+
+export function normalizeBrushMode(mode) {
+  return BRUSH_MODES.includes(mode) ? mode : null;
+}
 
 export function normalizeBrushSettings(value) {
   if (!value || typeof value !== 'object') return null;
@@ -15,11 +21,12 @@ export function normalizeBrushSettings(value) {
     const n = Number(value[key]);
     return Number.isFinite(n) ? Math.round(Math.min(max, Math.max(min, n))) : null;
   };
-  const size = number('size', 1, 160);
+  const size = number('size', 1, 256);
   const opacity = number('opacity', 1, 100);
   const smoothing = number('smoothing', 0, 80);
-  if (size === null || opacity === null || smoothing === null || typeof value.pressure !== 'boolean') return null;
-  return { size, opacity, smoothing, pressure: value.pressure };
+  const mode = value.mode === undefined ? 'pen' : normalizeBrushMode(value.mode);
+  if (size === null || opacity === null || smoothing === null || !mode || typeof value.pressure !== 'boolean') return null;
+  return { mode, size, opacity, smoothing, pressure: value.pressure };
 }
 
 export function normalizeCustomBrushPreset(value) {
