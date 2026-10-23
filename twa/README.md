@@ -24,6 +24,8 @@ GitHub project Pages (`https://owner.github.io/my-paint/`) can host the web app,
 
 TWA is browser-backed. It does not turn the website into a bundled native editor, guarantee persistent storage, or make an uncached first launch work offline. Save project-file backups.
 
+When a new service worker is ready, the app shows an update banner. The user can apply it immediately; the current drawing is saved first and the app reloads on the new version. If notification permission was already granted, the app also sends a device notification. Update detection requires the app/browser to run and check the site; this setup does not send remote push notifications while the app is closed.
+
 Official documentation:
 - https://developer.android.com/develop/ui/views/layout/webapps/guide-trusted-web-activities-version2
 - https://github.com/GoogleChromeLabs/bubblewrap
