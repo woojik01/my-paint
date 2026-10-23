@@ -1,0 +1,6 @@
+let database;
+export function db(){return database??=new Promise((resolve,reject)=>{const r=indexedDB.open('my-paint',1);r.onupgradeneeded=()=>{r.result.createObjectStore('projects',{keyPath:'id'});r.result.createObjectStore('settings');};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export async function putProject(record){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('projects','readwrite');tx.objectStore('projects').put(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
+export async function getProject(id){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('projects').objectStore('projects').get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+export async function listProjects(){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('projects').objectStore('projects').getAll();r.onsuccess=()=>res(r.result.sort((a,b)=>b.updated-a.updated));r.onerror=()=>rej(r.error);});}
+export async function deleteProject(id){const d=await db();return new Promise((res,rej)=>{const tx=d.transaction('projects','readwrite');tx.objectStore('projects').delete(id);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});}

@@ -1,0 +1,5 @@
+import {readdir,readFile,access} from 'node:fs/promises';import {spawnSync} from 'node:child_process';
+for(const f of await readdir('app'))if(f.endsWith('.js')){const r=spawnSync(process.execPath,['--check',`app/${f}`],{stdio:'inherit'});if(r.status)process.exit(r.status);}
+const sw=await readFile('sw.js','utf8');for(const [,path]of sw.matchAll(/'\.\/([^']+)'/g))await access(path);
+for(const f of ['index.html',...((await readdir('app')).map(x=>'app/'+x))]){const s=await readFile(f,'utf8');if(/live2d/i.test(s))throw Error('Forbidden UI term');if(/https?:\/\//.test(s)&&!f.endsWith('formats.js'))console.warn('Review external reference:',f);}
+const html=await readFile('index.html','utf8'),main=await readFile('app/main.js','utf8');const ids=new Set([...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]));for(const [,id]of main.matchAll(/(?:\$|on)\('#([a-z][a-z-]+)'/g))if(!ids.has(id))throw Error('Missing element '+id);console.log('Syntax, offline assets, UI constraints and DOM references passed');

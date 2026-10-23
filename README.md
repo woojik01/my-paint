@@ -1,5 +1,86 @@
 # My Paint
 
-Offline-first drawing web app with layered artwork and a parts workspace.
+로그인 없이 사용하는 오프라인 드로잉 웹앱입니다. 일반 그림과 부위별 파츠 원화를 하나의 작업실에서 만들 수 있습니다. 스마트폰·태블릿·PC를 위한 반응형 UI와 한국어·영어를 제공합니다.
 
-Implementation is developed through feature branches and pull requests.
+## 실행과 빌드
+
+Node.js 22 이상이 필요합니다. 앱 자체는 외부 라이브러리나 CDN 없이 동작하는 정적 HTML·CSS·ES Modules입니다. 개발 의존성은 검증에만 사용합니다.
+
+```sh
+npm ci
+npm run check
+npm test
+npm run build
+```
+
+`dist/` 전체를 HTTPS 정적 호스트에 배포하세요. 로컬 개발은 localhost 정적 서버를 사용하세요. `file://`로 직접 열면 모듈·저장·Service Worker가 정상 작동하지 않습니다. GitHub Pages에 올릴 경우 `dist/` 내용을 선택한 배포 브랜치·디렉터리에 게시하세요. 모든 앱 경로는 상대 경로입니다.
+
+## 0.1.0 구현 범위
+
+- 펜 필압, 손떨림 보정, 브러시·지우개·채우기·스포이트·사각형·타원.
+- 사각형 선택, 선택 영역 안 그리기·삭제·이동, 레이어 이동, 실행 취소·다시 실행.
+- 두 손가락 이동·확대·회전, 펜 전용 입력, 좌우 대칭 그리기, 반전 보기.
+- 레이어 추가·복제·이름 변경·정렬·삭제·표시·잠금·불투명도·그룹.
+- 일반·곱하기·스크린 합성, 알파 잠금, 클리핑, 비파괴 픽셀 마스크.
+- 파츠 작업용 얼굴·눈·머리카락·몸·의상 그룹 템플릿.
+- IndexedDB 자동 저장, 이전 저장 복구본, 최근 작업, 휴지통·복원·영구 삭제.
+- `.mypaint` 원본 파일 저장·불러오기, PNG/JPG/WebP/GIF 이미지 가져오기.
+- PNG, JPG, WebP, 정적 GIF, 이미지 포함 SVG, 레이어 PSD, 파츠 PNG+JSON ZIP 내보내기.
+- 앱과 인코더를 모두 캐시하는 PWA, 오프라인 준비 표시, 설치 프롬프트 지원 환경에서 설치 버튼.
+- 밝은·어두운 테마, 한국어·영어, 모바일 레이어 시트, 키보드 단축키.
+- [Android TWA 설정·패키징 안내](twa/README.md).
+
+## 내보내기 계약
+
+| 형식 | 동작과 제한 |
+| --- | --- |
+| `.mypaint` | UTF-8 manifest + 레이어·마스크 PNG의 무압축 ZIP. 그룹·이름·좌표·합성·설정을 보존. Undo 기록은 세션 전용 |
+| PNG | 합성 결과, 완전한 알파, 무손실 |
+| JPG | 합성 결과, 품질 조절, 투명 영역은 흰색 |
+| WebP | 브라우저 인코더, 손실 압축, 알파. 브라우저가 실제로 WebP를 반환하지 않으면 오류 |
+| GIF | 정적 GIF89a, 고정 256색 팔레트, 이진 투명도. 미세한 색과 반투명은 달라질 수 있음 |
+| SVG | 합성 PNG를 SVG `<image>`에 내장. 벡터 패스 변환이 아님 |
+| PSD | 자체 작성 8비트 RGB PSD v1. 한글 이름·그룹·표시·불투명도·순서 보존. 마스크·클리핑은 픽셀에 적용. 조정 레이어·스마트 오브젝트·CMYK 지원 없음 |
+| 파츠 ZIP | 원본 크기 투명 PNG, 그룹·순서·표시·불투명도·클리핑 메타데이터 JSON, 합성 미리보기 |
+
+PSD는 별도 `ag-psd` 파서로 그룹·한글 이름·픽셀·알파를 읽는 자동 검사를 통과했습니다. 실제 외부 모델 제작 도구·Photoshop 실기기 호환성은 아직 확인하지 않았습니다. PNG 파츠 파일은 레이어 합성 정보와 별개인 원본 파츠 이미지이며 JSON에 합성 설정을 함께 보관합니다.
+
+## 저장과 오프라인
+
+첫 온라인 접속에서 **오프라인 사용 준비 완료**를 확인한 뒤 네트워크 없이 작업할 수 있습니다. 자동 저장은 쓰기 트랜잭션 완료 후 성공 표시를 합니다. 이전 저장본 한 개를 유지하며 현재 저장본을 읽지 못하면 복구본 열기를 제안합니다.
+
+사이트 데이터 삭제·브라우저 저장 공간 정리·기기 초기화는 내부 작업을 삭제할 수 있습니다. **원본 저장**으로 `.mypaint` 파일을 외부에 백업하세요. 앱을 닫기 전 저장 상태를 확인하세요. 종료 직전 저장만으로 완전한 복구를 보장하지 않습니다.
+
+저장소는 IndexedDB 기반이며 OPFS·타일 단위 저장은 후속 최적화 범위입니다. 캔버스는 16–4096 px이며 픽셀 버퍼 예산에 따라 레이어 수를 제한합니다. 파츠 템플릿은 1024²를 권장하며 2048² 이상에서는 예산을 초과할 수 있습니다. 고해상도·다중 레이어 성능은 실기기에서 추가 측정해야 합니다.
+
+서비스 워커 업데이트는 기존 창이 닫힌 뒤 적용합니다. 새 릴리스에서 앱 파일을 수정하면 `sw.js`의 캐시 버전도 올리세요. 프로젝트 데이터는 캐시와 별도로 보존합니다.
+
+## 구조
+
+- `app/model.js`: 문서·레이어·마스크 합성·기록·채우기
+- `app/main.js`: 편집 입력·뷰포트·화면·저장·내보내기 연결
+- `app/binary.js`: ZIP/CRC32, PSD, GIF 인코더
+- `app/formats.js`: 프로젝트 파일 검증·복원·PNG 파츠·SVG
+- `app/encode-worker.js`: PSD/GIF 백그라운드 인코딩
+- `app/storage.js`: IndexedDB 트랜잭션
+- `sw.js`: 오프라인 자산 캐시
+- `tests/`: 파일 무결성·복원·합성·외부 파서 상호운용성 검사
+
+## 아직 포함하지 않은 기능
+
+애니메이션 타임라인·움직이는 GIF, 실제 벡터 패스 편집, PSD 가져오기, 올가미, 자동 파츠 분리, 메시·리깅·모델 실행, 클라우드 동기화는 후속 단계입니다. 초기 버전에서 완전한 외부 파일 호환성이나 무제한 레이어를 약속하지 않습니다.
+
+## 검증
+
+CI에서 구문·DOM 연결·오프라인 자산·금지된 UI 문자열 검사, Node 테스트, 정적 빌드를 수행합니다. 현재 작업 환경의 미리보기 서버가 제공되지 않아 브라우저 조작·Android 실기기·TWA 실행 검증은 완료되지 않았습니다. [수동 QA 체크리스트](docs/QA.md)를 사용하세요.
+
+## 기술 근거
+
+- [Canvas toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob)
+- [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers)
+- [Browser storage quotas](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria)
+- [Adobe PSD specification](https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/)
+- [SVG image embedding](https://www.w3.org/TR/SVG/embedded.html)
+- [GIF89a specification](https://www.w3.org/Graphics/GIF/spec-gif89a.txt)
+
+테스트 전용 의존성과 라이선스는 [THIRD_PARTY.md](THIRD_PARTY.md)를 참고하세요. 프로젝트 소스 라이선스는 저장소 소유자가 결정하며, 현재 문서는 별도의 배포 라이선스를 부여하지 않습니다.
