@@ -11,11 +11,15 @@ Run `npm ci`, `npm run check`, `npm test`, `npm run build`.
 - PSD decoding through independent ag-psd parser
 - GIF decoding through native image decoder
 - Service-worker cache inventory and required DOM IDs
+- Built-in and custom brush preset bounds/storage; favorite tool validation
 
 ## Manual — not yet verified
 
 - [ ] New canvas opens directly with one paint layer and no workspace-type selector. Existing projects retain all groups and pixels.
 - [ ] Desktop Chromium: create a canvas, draw, change color, erase, fill, undo/redo, save and reopen.
+- [ ] Search tools with Ctrl/Cmd+K and the toolbar magnifier; filter in Korean and English, invoke tools and commands.
+- [ ] Star and unstar tools; confirm favorite tools move to the front and remain after reload.
+- [ ] Apply each built-in brush preset, adjust settings, save a custom preset, reload, apply it, then delete it. Confirm deleting a preset does not affect existing artwork.
 - [ ] Android: pen pressure where supported, pen-only mode, pointer cancellation, two-finger gestures, orientation changes, toolbar scrolling and layer sheet.
 - [ ] Paint within a selection; move the selection; undo; clear selection. Check that mask edits stay non-destructive.
 - [ ] Fill transparent and partly transparent regions at several opacity values. Unchanged pixels must retain alpha.
