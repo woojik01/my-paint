@@ -12,6 +12,7 @@ Run `npm ci`, `npm run check`, `npm test`, `npm run build`.
 - GIF decoding through native image decoder
 - Service-worker cache inventory and required DOM IDs
 - Built-in and custom brush preset bounds/storage; favorite tool validation
+- Layer reorder stays within its parent and keeps groups with their children
 
 ## Manual — not yet verified
 
@@ -23,7 +24,7 @@ Run `npm ci`, `npm run check`, `npm test`, `npm run build`.
 - [ ] Android: pen pressure where supported, pen-only mode, pointer cancellation, two-finger gestures, orientation changes, toolbar scrolling and layer sheet.
 - [ ] Paint within a selection; move the selection; undo; clear selection. Check that mask edits stay non-destructive.
 - [ ] Fill transparent and partly transparent regions at several opacity values. Unchanged pixels must retain alpha.
-- [ ] Group/ungroup, reorder, clip, hide, lock, duplicate, delete and undo.
+- [ ] Group/ungroup, drag layers before/after each other, reorder with the up/down controls, clip, hide, lock, duplicate, delete and undo. Confirm root groups keep their child layers attached.
 - [ ] Save and reopen multiple projects, trash one, restore it. Permanently delete only disposable QA projects.
 - [ ] Force a storage failure; check that success is not displayed and project-file backup remains possible.
 - [ ] Interrupt a save, reopen and test the prior recovery copy.
