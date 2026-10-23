@@ -24,6 +24,7 @@ Run `npm ci`, `npm run check`, `npm test`, `npm run build`.
 - [ ] Force a storage failure; check that success is not displayed and project-file backup remains possible.
 - [ ] Interrupt a save, reopen and test the prior recovery copy.
 - [ ] Wait for offline-ready, disconnect, reload, edit, export every format, close and relaunch offline.
+- [ ] Deploy a new service-worker version; verify the update notice appears in the open app, pending work is saved, and applying the update reloads into the new version. Verify the device notification when permission is already granted.
 - [ ] In the target external editors, verify PSD group order, Unicode names, visibility, opacity and transparent edges.
 - [ ] Compare PNG/WebP output, JPG background, GIF palette/alpha and SVG embedded image.
 - [ ] Open parts ZIP, align PNGs using manifest information, verify group and clipping metadata.
