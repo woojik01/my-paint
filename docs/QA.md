@@ -14,6 +14,7 @@ Run `npm ci`, `npm run check`, `npm test`, `npm run build`.
 
 ## Manual — not yet verified
 
+- [ ] New canvas opens directly with one paint layer and no workspace-type selector. Existing projects retain all groups and pixels.
 - [ ] Desktop Chromium: create a canvas, draw, change color, erase, fill, undo/redo, save and reopen.
 - [ ] Android: pen pressure where supported, pen-only mode, pointer cancellation, two-finger gestures, orientation changes, toolbar scrolling and layer sheet.
 - [ ] Paint within a selection; move the selection; undo; clear selection. Check that mask edits stay non-destructive.

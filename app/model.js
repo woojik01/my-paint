@@ -3,13 +3,10 @@ export const id=()=>crypto.randomUUID();
 export const canvas=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
 export function layer(name,w,h,parent=null) { return {id:id(),name,type:'paint',parent,visible:true,locked:false,alphaLock:false,clip:false,opacity:1,blend:'source-over',canvas:canvas(w,h),mask:null}; }
 export function group(name) { return {id:id(),name,type:'group',parent:null,visible:true,locked:false,opacity:1,blend:'source-over'}; }
-export function createDocument(name,width,height,mode='drawing',background='#ffffff') {
+export function createDocument(name,width,height,background='#ffffff') {
   validateSize(width,height);
-  if(mode==='parts'&&width*height*4*8>MAX_BYTES/2)throw new Error('Parts template exceeds memory budget; use 1024 px');
-  const d={id:id(),name,width,height,mode,background,revision:0,updated:Date.now(),layers:[],active:null};
-  if(mode==='parts')for(const title of ['장식','앞머리','눈 왼쪽','눈 오른쪽','입','얼굴','뒷머리','몸·의상']) {const g=group(title);d.layers.push(g,layer(title,width,height,g.id));}
-  else d.layers.push(layer('Layer 1',width,height));
-  d.active=d.layers.find(l=>l.type==='paint').id;return d;
+  const first=layer('Layer 1',width,height);
+  return {id:id(),name,width,height,background,revision:0,updated:Date.now(),layers:[first],active:first.id};
 }
 export function validateSize(w,h) { if(!Number.isInteger(w)||!Number.isInteger(h)||w<16||h<16||w>4096||h>4096||w*h>16777216)throw new Error('Canvas size must be 16–4096 px'); }
 export function checkBudget(d,extra=1) { if(d.width*d.height*4*(d.layers.filter(l=>l.type==='paint').length+d.layers.filter(l=>l.mask).length+extra)>MAX_BYTES/2)throw new Error('Layer memory budget exceeded'); }
