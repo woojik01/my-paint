@@ -1,6 +1,6 @@
 const PREFIX='my-paint:'+self.registration.scope+':';
-const VERSION=PREFIX+'v5';
-const ASSETS=['./','./index.html','./app/style.css','./app/tokens.css','./app/main.js','./app/model.js','./app/storage.js','./app/formats.js','./app/binary.js','./app/ui.js','./app/preferences.js','./app/layers.js','./app/encode-worker.js','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'];
+const VERSION=PREFIX+'v6';
+const ASSETS=['./','./index.html','./app/style.css','./app/tokens.css','./app/main.js','./app/model.js','./app/storage.js','./app/formats.js','./app/binary.js','./app/ui.js','./app/preferences.js','./app/layers.js','./app/brush.js','./app/geometry.js','./app/encode-worker.js','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(VERSION).then(c=>c.addAll(ASSETS))));
 // Updates wait for existing clients to close; edits are never interrupted by skipWaiting.
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith(PREFIX)&&k!==VERSION)await caches.delete(k);await self.clients.claim();})()));
