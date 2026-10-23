@@ -26,3 +26,4 @@
 .favorite-toggle{width:38px;height:38px;border-radius:8px;color:var(--accent);font-size:20px;}
 .favorite-toggle[aria-pressed=true]{background:var(--soft);}
 .command-empty{padding:14px;color:var(--muted);font-size:12px;text-align:center;}
+.layer-row[draggable=true]{cursor:grab}.layer-row.dragging{opacity:.45}.layer-row.drag-over-top{box-shadow:inset 0 2px 0 var(--accent)}.layer-row.drag-over-bottom{box-shadow:inset 0 -2px 0 var(--accent)}
