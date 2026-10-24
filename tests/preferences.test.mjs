@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BRUSH_PRESETS, BRUSH_PRESETS_KEY, FAVORITES_KEY, loadCustomBrushPresets, loadToolFavorites, saveCustomBrushPresets, saveToolFavorites } from '../app/preferences.js';
+import { BRUSH_PRESETS, BRUSH_PRESETS_KEY, FAVORITES_KEY, loadCustomBrushPresets, loadToolFavorites, loadToolSizes, saveCustomBrushPresets, saveToolFavorites, saveToolSizes, TOOL_SIZES_KEY } from '../app/preferences.js';
 
 function memoryStorage(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -48,4 +48,12 @@ test('tool favorites keep only known tools and remove duplicates', () => {
   assert.deepEqual(loadToolFavorites(storage, allowed), ['brush', 'eraser']);
   assert.deepEqual(saveToolFavorites(['fill', 'brush', 'fill', 'unknown'], storage, allowed), ['fill', 'brush']);
   assert.deepEqual(JSON.parse(storage.getItem(FAVORITES_KEY)), ['fill', 'brush']);
+});
+
+test('brush, eraser and shape sizes persist independently and stay within bounds', () => {
+  const storage = memoryStorage();
+  const saved = saveToolSizes({ brush: 18, eraser: 42, rectangle: 999, ellipse: 2, fill: 90 }, storage);
+  assert.deepEqual(saved, { brush: 18, eraser: 42, rectangle: 256, ellipse: 2 });
+  assert.deepEqual(loadToolSizes(storage), saved);
+  assert.deepEqual(JSON.parse(storage.getItem(TOOL_SIZES_KEY)), saved);
 });
