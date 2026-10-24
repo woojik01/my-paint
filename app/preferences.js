@@ -9,6 +9,33 @@ export const BRUSH_PRESETS = Object.freeze([
 export const MAX_CUSTOM_BRUSH_PRESETS = 20;
 export const FAVORITES_KEY = 'my-paint-tool-favorites-v1';
 export const BRUSH_PRESETS_KEY = 'my-paint-brush-presets-v1';
+export const TOOL_SIZES_KEY = 'my-paint-tool-sizes-v1';
+export const TOOL_SIZE_DEFAULTS = Object.freeze({ brush: 12, eraser: 24, rectangle: 3, ellipse: 3 });
+
+export function normalizeToolSizes(value, allowed = Object.keys(TOOL_SIZE_DEFAULTS)) {
+  const sizes = { ...TOOL_SIZE_DEFAULTS };
+  if (!value || typeof value !== 'object') return sizes;
+  for (const name of allowed) {
+    const size = Number(value[name]);
+    if (Number.isFinite(size)) sizes[name] = Math.round(Math.min(256, Math.max(1, size)));
+  }
+  return sizes;
+}
+
+export function loadToolSizes(storage = globalThis.localStorage, allowed = Object.keys(TOOL_SIZE_DEFAULTS)) {
+  try {
+    if (!storage) return normalizeToolSizes(null, allowed);
+    return normalizeToolSizes(JSON.parse(storage.getItem(TOOL_SIZES_KEY) || '{}'), allowed);
+  } catch {
+    return normalizeToolSizes(null, allowed);
+  }
+}
+
+export function saveToolSizes(value, storage = globalThis.localStorage, allowed = Object.keys(TOOL_SIZE_DEFAULTS)) {
+  const sizes = normalizeToolSizes(value, allowed);
+  if (storage) storage.setItem(TOOL_SIZES_KEY, JSON.stringify(sizes));
+  return sizes;
+}
 export const BRUSH_MODES = Object.freeze(['pen', 'pencil', 'marker', 'airbrush']);
 
 export function normalizeBrushMode(mode) {
