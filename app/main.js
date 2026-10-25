@@ -11,7 +11,7 @@ const $=s=>document.querySelector(s),on=(s,e,fn)=>$(s).addEventListener(e,fn);
 const history=new History();let doc=null,tool='brush',selection=null,maskEditing=false,symmetry=false,dirty=false,saving=false,savePromise=null,saveTimer,trashView=false,offlineReady=false,promptInstall=null;
 let customBrushPresets=loadCustomBrushPresets(),currentBrushPresetId='basic',draggedLayerId=null;
 const sizedTools=Object.keys(TOOL_SIZE_DEFAULTS);let toolSizes=loadToolSizes(localStorage,sizedTools),brushTips=loadBrushTips(localStorage);
-const toolFavorites=loadToolFavorites(localStorage,['brush','eraser','fill','picker','select','move','rectangle','ellipse']);
+const toolFavorites=loadToolFavorites(localStorage,['brush','eraser','fill','picker','select','move','rectangle','ellipse']);if(brushTips.startSharpness||brushTips.endSharpness)currentBrushPresetId=null;
 let pan={x:0,y:0},zoom=1,rotation=0,mirrored=false,stroke=null,gesture=null,frame=0,strokeFrame=0,renderCache=null,projectURLs=[],lastFitZoom=1,lastStageWidth=0,lastStageHeight=0;
 const pointers=new Map(),view=$('#view-canvas'),zone=$('#canvas-stage'),vctx=view.getContext('2d'),color=()=>$('#color-input').value;
 let updateRegistration=null,waitingUpdateWorker=null,applyingUpdate=false,updateReloadPending=false,serviceWorkerControlled=!!navigator.serviceWorker?.controller;
