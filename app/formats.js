@@ -1,5 +1,6 @@
 import {zipStore,unzipStore} from './binary.js';
 import {canvas,effectiveLayer,composite,MAX_BYTES,validateSize} from './model.js';
+import {validImageObject} from './image-transform.js';
 export const toBlob=(c,type='image/png',quality=.92)=>new Promise((resolve,reject)=>c.toBlob(b=>b&&b.type===type?resolve(b):reject(new Error('This encoder is unavailable')),type,quality));
 export async function serialize(d) {
   const files={},metadata={format:'my-paint',version:1,id:d.id,name:d.name,width:d.width,height:d.height,background:d.background,active:d.active,revision:d.revision,layers:[]};
@@ -12,7 +13,7 @@ export async function deserialize(blob) {
   if(d.format!=='my-paint'||d.version!==1||!Array.isArray(d.layers)||d.layers.length>96)throw new Error('Unsupported project');
   validateSize(d.width,d.height);if(d.width*d.height*4*(d.layers.filter(l=>l.type==='paint').length+Object.keys(files).filter(k=>k.startsWith('masks/')).length)>MAX_BYTES/2)throw new Error('Project memory budget exceeded');
   if(typeof d.id!=='string'||typeof d.name!=='string'||d.name.length>160||(d.mode!==undefined&&!['drawing','parts'].includes(d.mode))||!(d.background==='transparent'||/^#[0-9a-f]{6}$/i.test(d.background)))throw new Error('Invalid document');
-  const ids=new Set(),groups=new Set();for(const l of d.layers){if(typeof l.id!=='string'||!/^[-a-z0-9]+$/i.test(l.id)||ids.has(l.id)||!['group','paint'].includes(l.type)||typeof l.visible!=='boolean'||typeof l.locked!=='boolean'||(l.parent!==null&&typeof l.parent!=='string')||typeof l.name!=='string'||l.name.length>160||!Number.isFinite(l.opacity)||l.opacity<0||l.opacity>1||!['source-over','multiply','screen'].includes(l.blend))throw new Error('Invalid layer');ids.add(l.id);if(l.type==='group')groups.add(l.id);}
+  const ids=new Set(),groups=new Set();for(const l of d.layers){if(typeof l.id!=='string'||!/^[-a-z0-9]+$/i.test(l.id)||ids.has(l.id)||!['group','paint'].includes(l.type)||typeof l.visible!=='boolean'||typeof l.locked!=='boolean'||(l.parent!==null&&typeof l.parent!=='string')||typeof l.name!=='string'||l.name.length>160||!Number.isFinite(l.opacity)||l.opacity<0||l.opacity>1||!['source-over','multiply','screen'].includes(l.blend)||(l.imageObject!==undefined&&!validImageObject(l,d.width,d.height)))throw new Error('Invalid layer');ids.add(l.id);if(l.type==='group')groups.add(l.id);}
   for(const l of d.layers){if(l.parent&&(!groups.has(l.parent)||l.type==='group'))throw new Error('Invalid group');if(l.type==='paint'){if(!files[`layers/${l.id}.png`])throw new Error('Missing layer');l.canvas=await decode(files[`layers/${l.id}.png`],d.width,d.height);l.mask=files[`masks/${l.id}.png`]?await decode(files[`masks/${l.id}.png`],d.width,d.height):null;}}
   if(!d.layers.some(l=>l.type==='paint'))throw new Error('Missing paint layer');if(!ids.has(d.active))d.active=d.layers.find(l=>l.type==='paint').id;// Older projects used separate workspaces; keep every layer and discard only the label.
   delete d.mode;d.updated=Date.now();return d;

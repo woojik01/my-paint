@@ -1,3 +1,4 @@
+import {renderImageObject} from './image-transform.js';
 export const MAX_BYTES=192*1024*1024;
 export const id=()=>crypto.randomUUID();
 export const canvas=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
@@ -10,7 +11,12 @@ export function createDocument(name,width,height,background='#ffffff') {
 }
 export function validateSize(w,h) { if(!Number.isInteger(w)||!Number.isInteger(h)||w<16||h<16||w>4096||h>4096||w*h>16777216)throw new Error('Canvas size must be 16–4096 px'); }
 export function checkBudget(d,extra=1) { if(d.width*d.height*4*(d.layers.filter(l=>l.type==='paint').length+d.layers.filter(l=>l.mask).length+extra)>MAX_BYTES/2)throw new Error('Layer memory budget exceeded'); }
-export function effectiveLayer(l) { if(!l.mask)return l.canvas; const c=canvas(l.canvas.width,l.canvas.height),x=c.getContext('2d');x.drawImage(l.canvas,0,0);x.globalCompositeOperation='destination-in';x.drawImage(l.mask,0,0);return c; }
+export function effectiveLayer(l) {
+  let image=l.canvas;
+  if(l.mask){image=canvas(l.canvas.width,l.canvas.height);const x=image.getContext('2d');x.drawImage(l.canvas,0,0);x.globalCompositeOperation='destination-in';x.drawImage(l.mask,0,0);}
+  if(l.imageObject&&l.imageSourceBounds&&l.imageTransform)image=renderImageObject(image,l.imageSourceBounds,l.imageTransform,canvas);
+  return image;
+}
 export function renderLayers(d,includeHidden=false) {
   const output=canvas(d.width,d.height), ctx=output.getContext('2d');
   const drawList=(items,target)=>{let base=null;for(const l of [...items].reverse()) {
