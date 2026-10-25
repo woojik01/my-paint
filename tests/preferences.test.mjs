@@ -26,7 +26,7 @@ test('custom brush presets are validated, bounded and round-trip through storage
     { id: 'custom-1', name: 'duplicate', settings: { size: 10, opacity: 50, smoothing: 20, pressure: false } },
   ];
   const saved = saveCustomBrushPresets(presets, storage);
-  assert.deepEqual(saved, [{ id: 'custom-1', name: 'Soft sketch', settings: { mode: 'pen', size: 256, opacity: 50, smoothing: 0, pressure: true } }]);
+  assert.deepEqual(saved, [{ id: 'custom-1', name: 'Soft sketch', settings: { mode: 'pen', size: 256, opacity: 50, smoothing: 0, pressure: true, startSharpness: 0, endSharpness: 0 } }]);
   assert.deepEqual(loadCustomBrushPresets(storage), saved);
   storage.setItem(BRUSH_PRESETS_KEY, '{bad json');
   assert.deepEqual(loadCustomBrushPresets(storage), []);
