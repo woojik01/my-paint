@@ -1,5 +1,5 @@
 const PREFIX='my-paint:'+self.registration.scope+':';
-const VERSION=PREFIX+'v9';
+const VERSION=PREFIX+'v10';
 const ASSETS=['./','./index.html','./app/style.css','./app/tokens.css','./app/main.js','./app/model.js','./app/storage.js','./app/formats.js','./app/binary.js','./app/psd.js','./app/ui.js','./app/preferences.js','./app/layers.js','./app/brush.js','./app/geometry.js','./app/encode-worker.js','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(VERSION).then(c=>c.addAll(ASSETS))));
 // The app saves open documents before asking the waiting worker to activate.

@@ -34,3 +34,25 @@
 .favorite-toggle[aria-pressed=true]{background:var(--soft);}
 .command-empty{padding:14px;color:var(--muted);font-size:12px;text-align:center;}
 .layer-row[draggable=true]{cursor:grab}.layer-row.dragging{opacity:.45}.layer-row.drag-over-top{box-shadow:inset 0 2px 0 var(--accent)}.layer-row.drag-over-bottom{box-shadow:inset 0 -2px 0 var(--accent)}
+
+
+/* Keep drawing adjustments below the canvas stage on every screen size. */
+.canvas-zone{display:flex;flex-direction:column}
+.canvas-stage{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:var(--canvas);touch-action:none;user-select:none}
+.canvas-stage>canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.canvas-stage>.canvas-empty-tip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.viewport-controls{position:relative;bottom:auto;left:auto;transform:none;align-self:center;flex:0 0 auto;margin:5px auto 7px}
+.tool-size-dock{display:none}
+.brush-ends-settings{margin:8px 0 2px;padding:0;border:0}
+.brush-ends-title{font-size:10px;font-weight:650;color:var(--ink);margin:5px 0 2px}
+.brush-ends-settings .slider-label{margin:7px 0 10px}
+.range-hints{grid-column:1/-1;display:flex;justify-content:space-between;margin-top:-5px;font-size:9px;color:var(--muted)}
+.brush-preview svg{stroke:none}
+@media(max-width:760px){
+  .canvas-zone{min-height:0}
+  .tool-size-dock:not([hidden]){position:relative;z-index:1;left:auto;bottom:auto;transform:none;width:min(430px,calc(100% - 20px));min-height:42px;flex:0 0 auto;display:grid;grid-template-columns:auto 30px minmax(48px,1fr) 48px 30px;align-items:center;gap:6px;margin:5px auto 1px;padding:5px 8px;border:1px solid var(--line);border-radius:11px;background:var(--surface);box-shadow:0 2px 8px #21103012;color:var(--ink);font-size:10px}
+  .tool-size-dock button{height:30px;min-width:30px;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:16px;line-height:1}
+  .tool-size-dock input[type=range]{width:100%;min-width:0;height:4px;margin:0;accent-color:var(--accent)}
+  .tool-size-dock input[type=number]{width:100%;height:30px;min-width:0;padding:4px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:10px;text-align:center;font-variant-numeric:tabular-nums}
+  .viewport-controls{position:relative;bottom:auto;left:auto;transform:none;min-height:36px;margin:3px auto 6px;padding:1px 5px}
+}

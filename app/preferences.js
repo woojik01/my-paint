@@ -1,14 +1,41 @@
 export const BRUSH_PRESETS = Object.freeze([
-  { id: 'basic', nameKey: 'presetBasic', settings: { mode: 'pen', size: 12, opacity: 100, smoothing: 35, pressure: true } },
-  { id: 'pencil', nameKey: 'presetPencil', settings: { mode: 'pencil', size: 5, opacity: 58, smoothing: 24, pressure: true } },
-  { id: 'ink', nameKey: 'presetInk', settings: { mode: 'pen', size: 3, opacity: 100, smoothing: 58, pressure: true } },
-  { id: 'marker', nameKey: 'presetMarker', settings: { mode: 'marker', size: 22, opacity: 62, smoothing: 12, pressure: false } },
-  { id: 'airbrush', nameKey: 'presetAirbrush', settings: { mode: 'airbrush', size: 48, opacity: 72, smoothing: 8, pressure: true } },
+  { id: 'basic', nameKey: 'presetBasic', settings: { mode: 'pen', size: 12, opacity: 100, smoothing: 35, pressure: true, startSharpness: 0, endSharpness: 0 } },
+  { id: 'pencil', nameKey: 'presetPencil', settings: { mode: 'pencil', size: 5, opacity: 58, smoothing: 24, pressure: true, startSharpness: 0, endSharpness: 0 } },
+  { id: 'ink', nameKey: 'presetInk', settings: { mode: 'pen', size: 3, opacity: 100, smoothing: 58, pressure: true, startSharpness: 0, endSharpness: 0 } },
+  { id: 'marker', nameKey: 'presetMarker', settings: { mode: 'marker', size: 22, opacity: 62, smoothing: 12, pressure: false, startSharpness: 0, endSharpness: 0 } },
+  { id: 'airbrush', nameKey: 'presetAirbrush', settings: { mode: 'airbrush', size: 48, opacity: 72, smoothing: 8, pressure: true, startSharpness: 0, endSharpness: 0 } },
 ]);
 
 export const MAX_CUSTOM_BRUSH_PRESETS = 20;
+export function normalizeBrushTips(value) {
+  const tips = { ...BRUSH_TIP_DEFAULTS };
+  if (!value || typeof value !== 'object') return tips;
+  for (const key of Object.keys(tips)) {
+    const number = Number(value[key]);
+    if (Number.isFinite(number)) tips[key] = Math.round(Math.min(100, Math.max(0, number)));
+  }
+  return tips;
+}
+
+export function loadBrushTips(storage = globalThis.localStorage) {
+  try {
+    if (!storage) return normalizeBrushTips(null);
+    return normalizeBrushTips(JSON.parse(storage.getItem(BRUSH_TIPS_KEY) || '{}'));
+  } catch {
+    return normalizeBrushTips(null);
+  }
+}
+
+export function saveBrushTips(value, storage = globalThis.localStorage) {
+  const tips = normalizeBrushTips(value);
+  if (storage) storage.setItem(BRUSH_TIPS_KEY, JSON.stringify(tips));
+  return tips;
+}
+
 export const FAVORITES_KEY = 'my-paint-tool-favorites-v1';
 export const BRUSH_PRESETS_KEY = 'my-paint-brush-presets-v1';
+export const BRUSH_TIPS_KEY = 'my-paint-brush-tips-v1';
+export const BRUSH_TIP_DEFAULTS = Object.freeze({ startSharpness: 0, endSharpness: 0 });
 export const TOOL_SIZES_KEY = 'my-paint-tool-sizes-v1';
 export const TOOL_SIZE_DEFAULTS = Object.freeze({ brush: 12, eraser: 24, rectangle: 3, ellipse: 3 });
 
@@ -53,7 +80,10 @@ export function normalizeBrushSettings(value) {
   const smoothing = number('smoothing', 0, 80);
   const mode = value.mode === undefined ? 'pen' : normalizeBrushMode(value.mode);
   if (size === null || opacity === null || smoothing === null || !mode || typeof value.pressure !== 'boolean') return null;
-  return { mode, size, opacity, smoothing, pressure: value.pressure };
+  const sharpness = key => value[key] === undefined ? 0 : number(key, 0, 100);
+  const startSharpness = sharpness('startSharpness'), endSharpness = sharpness('endSharpness');
+  if (startSharpness === null || endSharpness === null) return null;
+  return { mode, size, opacity, smoothing, pressure: value.pressure, startSharpness, endSharpness };
 }
 
 export function normalizeCustomBrushPreset(value) {
