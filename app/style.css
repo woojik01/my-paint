@@ -50,9 +50,19 @@
 .brush-preview svg{stroke:none}
 @media(max-width:760px){
   .canvas-zone{min-height:0}
-  .tool-size-dock:not([hidden]){position:relative;z-index:1;left:auto;bottom:auto;transform:none;width:min(430px,calc(100% - 20px));min-height:42px;flex:0 0 auto;display:grid;grid-template-columns:auto 30px minmax(48px,1fr) 48px 30px;align-items:center;gap:6px;margin:5px auto 1px;padding:5px 8px;border:1px solid var(--line);border-radius:11px;background:var(--surface);box-shadow:0 2px 8px #21103012;color:var(--ink);font-size:10px}
+  .tool-size-dock:not([hidden]){position:relative;z-index:1;left:auto;bottom:auto;transform:none;width:min(430px,calc(100% - 20px));min-height:42px;flex:0 0 auto;display:grid;grid-template-columns:auto 30px minmax(48px,1fr) 48px 30px 30px;align-items:center;gap:6px;margin:5px auto 1px;padding:5px 8px;border:1px solid var(--line);border-radius:11px;background:var(--surface);box-shadow:0 2px 8px #21103012;color:var(--ink);font-size:10px}
   .tool-size-dock button{height:30px;min-width:30px;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:16px;line-height:1}
   .tool-size-dock input[type=range]{width:100%;min-width:0;height:4px;margin:0;accent-color:var(--accent)}
   .tool-size-dock input[type=number]{width:100%;height:30px;min-width:0;padding:4px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:10px;text-align:center;font-variant-numeric:tabular-nums}
   .viewport-controls{position:relative;bottom:auto;left:auto;transform:none;min-height:36px;margin:3px auto 6px;padding:1px 5px}
+}
+
+
+body.editor-active .app-header{display:none!important}
+body.editor-active .workspace{height:calc(100dvh - 107px)!important}
+@media(max-width:760px){
+  body.editor-active .workspace{height:calc(100dvh - 96px)!important}
+  body.editor-active .side-panel.open{top:calc(env(safe-area-inset-top) + 67px)}
+  .tool-size-dock .tool-size-close{height:30px;min-width:30px;min-height:30px;padding:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--muted)}
+  .tool-size-dock .tool-size-close svg{width:14px;height:14px}
 }
